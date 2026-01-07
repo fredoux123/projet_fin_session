@@ -1,0 +1,24 @@
+services:
+  api:
+    build: ./api
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - DISCOVERY_URL=http://discovery:3001
+      - IA_URL=http://ia:8001
+    depends_on:
+      - discovery
+      - ia
+
+  discovery:
+    build: ./discovery-service
+    ports:
+      - "3001:3001"
+    environment:
+      - PORT=3001
+
+  ia:
+    build: ./ia-service
+    ports:
+      - "8001:8001"
