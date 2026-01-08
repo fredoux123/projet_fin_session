@@ -3,6 +3,9 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { fileURLToPath } from 'url';
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 const app = express();
 app.use(cors());
@@ -15,7 +18,11 @@ const IA_URL = process.env.IA_URL || 'http://localhost:8001';
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'api' }));
 
-app.get('/api/v1/external-artists', async (req, res) => {gi
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1', userRoutes);
+app.use('/api/v1/admin', adminRoutes);
+
+app.get('/api/v1/external-artists', async (req, res) => {
   try {
     const r = await fetch(`${DISCOVERY_URL}/external-artists`);
     res.json(await r.json());
@@ -32,6 +39,15 @@ app.get('/api/v1/recommendations', async (req, res) => {
   } catch {
     res.status(502).json({ error: 'IA service unreachable' });
   }
+});
+
+app.use((err, req, res, next) => {
+  if (!err) {
+    next();
+    return;
+  }
+  const status = err.status || 500;
+  res.status(status).json({ error: err.message || 'Internal error' });
 });
 
 export { app };
