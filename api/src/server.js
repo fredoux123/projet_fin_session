@@ -2,6 +2,7 @@ import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
+import { fileURLToPath } from 'url';
 
 const app = express();
 app.use(cors());
@@ -14,7 +15,7 @@ const IA_URL = process.env.IA_URL || 'http://localhost:8001';
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'api' }));
 
-app.get('/api/v1/external-artists', async (req, res) => {
+app.get('/api/v1/external-artists', async (req, res) => {gi
   try {
     const r = await fetch(`${DISCOVERY_URL}/external-artists`);
     res.json(await r.json());
@@ -33,4 +34,9 @@ app.get('/api/v1/recommendations', async (req, res) => {
   }
 });
 
-app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+export { app };
+
+const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
+if (isDirectRun) {
+  app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+}
