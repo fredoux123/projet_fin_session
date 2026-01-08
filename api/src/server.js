@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
+import publicRoutes from './routes/publicRoutes.js';
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ const IA_URL = process.env.IA_URL || 'http://localhost:8001';
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'api' }));
 
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
