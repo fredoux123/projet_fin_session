@@ -114,6 +114,21 @@ curl -s -X POST http://localhost:3000/api/v1/tracks/<trackId>/play \
   -H "Authorization: Bearer $TOKEN"
 ```
 
+## Historique d'ecoute
+Lister l'historique (token requis):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -s http://localhost:3000/api/v1/history \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Vider l'historique (token requis):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -i -X DELETE http://localhost:3000/api/v1/history \
+  -H "Authorization: Bearer $TOKEN"
+```
+
 ## External / IA (optionnel)
 Artistes externes:
 ```bash

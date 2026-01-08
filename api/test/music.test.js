@@ -78,6 +78,25 @@ test('artist can create artist and track, user can play', async () => {
   });
   assert.equal(playRes.status, 200);
   assert.equal(playBody.item.playCount, 1);
+
+  const { res: historyRes, body: historyBody } = await request('/api/v1/history', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(historyRes.status, 200);
+  assert.ok(Array.isArray(historyBody.items));
+  assert.equal(historyBody.items[0].trackId, trackId);
+
+  const { res: clearRes } = await request('/api/v1/history', {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(clearRes.status, 204);
+
+  const { res: historyAfterRes, body: historyAfterBody } = await request('/api/v1/history', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(historyAfterRes.status, 200);
+  assert.equal(historyAfterBody.items.length, 0);
 });
 
 test('artist cannot edit another artist profile', async () => {

@@ -5,6 +5,7 @@ import morgan from 'morgan';
 import { fileURLToPath } from 'url';
 import authRoutes from './routes/authRoutes.js';
 import artistRoutes from './routes/artistRoutes.js';
+import historyRoutes from './routes/historyRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -25,6 +26,7 @@ app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1', artistRoutes);
 app.use('/api/v1', trackRoutes);
+app.use('/api/v1', historyRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 

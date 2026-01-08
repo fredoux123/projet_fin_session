@@ -81,6 +81,9 @@ npx expo start
 ## 4.1) Mini doc API
 Voir `docs/API.md` pour les exemples `curl` et les endpoints Sprint 2.
 
+## 4.2) Resume des sprints
+Voir `docs/SPRINTS.md` pour le recap des livrables.
+
 ## 5) Docker (optionnel)
 ```bash
 docker compose up --build

@@ -1,4 +1,5 @@
 import trackService from '../services/trackService.js';
+import historyService from '../services/historyService.js';
 
 export function list(req, res, next) {
   try {
@@ -48,6 +49,7 @@ export function remove(req, res, next) {
 export function play(req, res, next) {
   try {
     const track = trackService.playTrack(req.params.id);
+    historyService.recordPlay(req.user.id, track.id);
     res.status(200).json({ item: track });
   } catch (err) {
     next(err);
