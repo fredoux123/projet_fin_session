@@ -1,3 +1,3 @@
 export function ping(req, res) {
-  res.status(200).json({ status: 'ok', scope: 'public' });
+  res.status(200).json({ item: { status: 'ok', scope: 'public' } });
 }

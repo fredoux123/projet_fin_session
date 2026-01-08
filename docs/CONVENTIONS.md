@@ -15,3 +15,6 @@
 - `discovery-service/` (Express)
 - `ia-service/` (FastAPI)
 - `docs/` (livrables + config)
+
+## Documentation API
+- `docs/API.md` : endpoints + exemples curl (MVP)

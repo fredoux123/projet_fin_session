@@ -47,8 +47,8 @@ test('register/login user and access /me', async () => {
     headers: { Authorization: `Bearer ${loginBody.token}` },
   });
   assert.equal(meRes.status, 200);
-  assert.equal(meBody.user.email, email);
-  assert.equal(meBody.user.role, 'USER');
+  assert.equal(meBody.item.email, email);
+  assert.equal(meBody.item.role, 'USER');
 });
 
 test('admin route requires ADMIN role', async () => {
@@ -87,7 +87,7 @@ test('admin route requires ADMIN role', async () => {
     headers: { Authorization: `Bearer ${adminLogin.token}` },
   });
   assert.equal(adminRes.status, 200);
-  assert.equal(adminBody.scope, 'admin');
+  assert.equal(adminBody.item.scope, 'admin');
 });
 
 test('visitor without token is rejected on admin endpoint', async () => {
@@ -98,5 +98,33 @@ test('visitor without token is rejected on admin endpoint', async () => {
 test('public ping is accessible without token', async () => {
   const { res, body } = await request('/api/v1/public/ping');
   assert.equal(res.status, 200);
-  assert.equal(body.scope, 'public');
+  assert.equal(body.item.scope, 'public');
+});
+
+test('public artists list works without token', async () => {
+  const { res, body } = await request('/api/v1/artists');
+  assert.equal(res.status, 200);
+  assert.ok(Array.isArray(body.items));
+});
+
+test('public external artists returns items', async () => {
+  const { res, body } = await request('/api/v1/external-artists');
+  if (res.status === 200) {
+    assert.ok(Array.isArray(body.items));
+    assert.ok(body.source);
+  } else {
+    assert.equal(res.status, 502);
+    assert.ok(body.error);
+  }
+});
+
+test('public recommendations returns item', async () => {
+  const { res, body } = await request('/api/v1/recommendations?userId=demo');
+  if (res.status === 200) {
+    assert.ok(body.item);
+    assert.equal(body.item.userId, 'demo');
+  } else {
+    assert.equal(res.status, 502);
+    assert.ok(body.error);
+  }
 });

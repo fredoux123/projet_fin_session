@@ -19,5 +19,5 @@ test('health endpoint responds', async () => {
   const res = await fetch(`${baseUrl}/health`);
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.equal(body.service, 'api');
+  assert.equal(body.item.service, 'api');
 });

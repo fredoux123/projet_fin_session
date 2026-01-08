@@ -63,6 +63,7 @@ npx expo start
 - `docs/SETUP.md` : configuration pas-à-pas
 - `docs/PIPELINE.md` : explication CI/CD
 - `docs/CONVENTIONS.md` : conventions & structure
+- `docs/API.md` : mini doc API + exemples curl
 
 ## 5) Variables d’environnement
 Voir les fichiers `.env.example` dans chaque service.
