@@ -17,4 +17,4 @@
 - `docs/` (livrables + config)
 
 ## Documentation API
-- `docs/API.md` : endpoints + exemples curl (MVP)
+- `docs/API.md` : Endpoints + exemples curl (MVP)
