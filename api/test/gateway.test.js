@@ -1,6 +1,7 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import http from 'node:http';
+import mongoose from 'mongoose';
 import { app } from '../src/server.js';
 
 let server;
@@ -58,6 +59,7 @@ before(async () => {
 after(() => new Promise((resolve) => server.close(resolve)));
 after(() => new Promise((resolve) => discoveryServer.close(resolve)));
 after(() => new Promise((resolve) => iaServer.close(resolve)));
+after(() => mongoose.connection.close());
 
 test('gateway proxies discovery service', async () => {
   const res = await fetch(`${baseUrl}/api/v1/gateway/discovery/external-artists`);

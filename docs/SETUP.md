@@ -51,6 +51,10 @@ npm run dev
 ```
 Test : http://localhost:3000/health
 
+Notes MongoDB:
+- renseigner `MONGO_URL` dans `api/.env`
+- exemple local: `mongodb://localhost:27017/mtlvibes`
+
 ### 3.2 Microservice Découvertes
 ```bash
 cd ../discovery-service
@@ -87,6 +91,12 @@ Voir `docs/SPRINTS.md` pour le recap des livrables.
 ## 5) Docker (optionnel)
 ```bash
 docker compose up --build
+```
+
+### Scripts utilitaires
+```bash
+./scripts/compose-up.sh
+./scripts/compose-down.sh
 ```
 
 ## 6) Vérification “prêt à coder”

@@ -1,44 +1,41 @@
-import crypto from 'node:crypto';
+import Artist from '../models/Artist.js';
 
-const artists = [];
-
-function create({ stageName, bio, city, photoUrl, userId }) {
-  const artist = {
-    id: crypto.randomUUID(),
-    stageName,
-    bio: bio || '',
-    city: city || '',
-    photoUrl: photoUrl || '',
-    userId,
+function toDTO(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    stageName: obj.stageName,
+    bio: obj.bio,
+    city: obj.city,
+    photoUrl: obj.photoUrl,
+    userId: obj.userId,
   };
-  artists.push(artist);
-  return artist;
 }
 
-function findById(id) {
-  return artists.find((artist) => artist.id === id) || null;
+async function create({ stageName, bio, city, photoUrl, userId }) {
+  const artist = await Artist.create({ stageName, bio, city, photoUrl, userId });
+  return toDTO(artist);
 }
 
-function findAll() {
-  return [...artists];
+async function findById(id) {
+  const artist = await Artist.findById(id).lean();
+  return toDTO(artist);
 }
 
-function update(id, updates) {
-  const artist = findById(id);
-  if (!artist) {
-    return null;
-  }
-  Object.assign(artist, updates);
-  return artist;
+async function findAll() {
+  const artists = await Artist.find({}).lean();
+  return artists.map(toDTO);
 }
 
-function remove(id) {
-  const index = artists.findIndex((artist) => artist.id === id);
-  if (index === -1) {
-    return null;
-  }
-  const [removed] = artists.splice(index, 1);
-  return removed;
+async function update(id, updates) {
+  const artist = await Artist.findByIdAndUpdate(id, updates, { new: true }).lean();
+  return toDTO(artist);
+}
+
+async function remove(id) {
+  const artist = await Artist.findByIdAndDelete(id).lean();
+  return toDTO(artist);
 }
 
 export default {

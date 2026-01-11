@@ -1,44 +1,44 @@
 import artistService from '../services/artistService.js';
 
-export function list(req, res, next) {
+export async function list(req, res, next) {
   try {
-    const artists = artistService.listArtists(req.query);
+    const artists = await artistService.listArtists(req.query);
     res.status(200).json({ items: artists });
   } catch (err) {
     next(err);
   }
 }
 
-export function get(req, res, next) {
+export async function get(req, res, next) {
   try {
-    const artist = artistService.getArtist(req.params.id);
+    const artist = await artistService.getArtist(req.params.id);
     res.status(200).json({ item: artist });
   } catch (err) {
     next(err);
   }
 }
 
-export function create(req, res, next) {
+export async function create(req, res, next) {
   try {
-    const artist = artistService.createArtist(req.body, req.user);
+    const artist = await artistService.createArtist(req.body, req.user);
     res.status(201).json({ item: artist });
   } catch (err) {
     next(err);
   }
 }
 
-export function update(req, res, next) {
+export async function update(req, res, next) {
   try {
-    const artist = artistService.updateArtist(req.params.id, req.body, req.user);
+    const artist = await artistService.updateArtist(req.params.id, req.body, req.user);
     res.status(200).json({ item: artist });
   } catch (err) {
     next(err);
   }
 }
 
-export function remove(req, res, next) {
+export async function remove(req, res, next) {
   try {
-    artistService.deleteArtist(req.params.id);
+    await artistService.deleteArtist(req.params.id);
     res.status(204).send();
   } catch (err) {
     next(err);

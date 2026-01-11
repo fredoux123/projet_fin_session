@@ -129,6 +129,35 @@ curl -i -X DELETE http://localhost:3000/api/v1/history \
   -H "Authorization: Bearer $TOKEN"
 ```
 
+## Favoris (Artistes)
+Ajouter un artiste en favori (token requis):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -s -X POST http://localhost:3000/api/v1/favorites/artists/<artistId> \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Lister les favoris (token requis):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -s http://localhost:3000/api/v1/favorites/artists \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Lister sans enrichissement artiste (option):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -s "http://localhost:3000/api/v1/favorites/artists?withArtists=false" \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Retirer un favori (token requis):
+```bash
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -i -X DELETE http://localhost:3000/api/v1/favorites/artists/<artistId> \
+  -H "Authorization: Bearer $TOKEN"
+```
+
 ## External / IA (optionnel)
 Artistes externes:
 ```bash
@@ -138,4 +167,15 @@ curl -s http://localhost:3000/api/v1/external-artists
 Recommandations:
 ```bash
 curl -s "http://localhost:3000/api/v1/recommendations?userId=demo"
+```
+
+## API Gateway (proxy simple)
+Proxy vers discovery-service:
+```bash
+curl -s http://localhost:3000/api/v1/gateway/discovery/external-artists
+```
+
+Proxy vers ia-service:
+```bash
+curl -s "http://localhost:3000/api/v1/gateway/ia/recommendations?userId=demo"
 ```

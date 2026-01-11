@@ -5,12 +5,13 @@ function normalizeQuery(value) {
   return typeof value === 'string' ? value.trim().toLowerCase() : '';
 }
 
-function listArtists({ q, city, genre }) {
+async function listArtists({ q, city, genre }) {
   const query = normalizeQuery(q);
   const cityQuery = normalizeQuery(city);
   const genreQuery = normalizeQuery(genre);
 
-  return artistRepository.findAll().filter((artist) => {
+  const artists = await artistRepository.findAll();
+  return artists.filter((artist) => {
     if (query && !artist.stageName.toLowerCase().includes(query)) {
       return false;
     }
@@ -24,15 +25,15 @@ function listArtists({ q, city, genre }) {
   });
 }
 
-function getArtist(id) {
-  const artist = artistRepository.findById(id);
+async function getArtist(id) {
+  const artist = await artistRepository.findById(id);
   if (!artist) {
     throw new HttpError(404, 'Artist not found');
   }
   return artist;
 }
 
-function createArtist({ stageName, bio, city, photoUrl }, user) {
+async function createArtist({ stageName, bio, city, photoUrl }, user) {
   if (!stageName || typeof stageName !== 'string') {
     throw new HttpError(400, 'Stage name is required');
   }
@@ -45,8 +46,8 @@ function createArtist({ stageName, bio, city, photoUrl }, user) {
   });
 }
 
-function updateArtist(id, updates, user) {
-  const artist = getArtist(id);
+async function updateArtist(id, updates, user) {
+  const artist = await getArtist(id);
   if (user.role !== 'ADMIN' && artist.userId !== user.id) {
     throw new HttpError(403, 'Forbidden');
   }
@@ -66,8 +67,8 @@ function updateArtist(id, updates, user) {
   return artistRepository.update(id, sanitized);
 }
 
-function deleteArtist(id) {
-  const removed = artistRepository.remove(id);
+async function deleteArtist(id) {
+  const removed = await artistRepository.remove(id);
   if (!removed) {
     throw new HttpError(404, 'Artist not found');
   }

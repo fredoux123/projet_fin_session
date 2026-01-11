@@ -1,9 +1,13 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
+import mongoose from 'mongoose';
 import { app } from '../src/server.js';
 
 let server;
 let baseUrl;
+let artistToken;
+let otherArtistToken;
+let userToken;
 
 function uniqueEmail(prefix) {
   return `${prefix}-${Date.now()}@test.com`;
@@ -38,12 +42,16 @@ before(() => new Promise((resolve) => {
     resolve();
   });
 }));
+before(async () => {
+  artistToken = await registerAndLogin('ARTIST');
+  otherArtistToken = await registerAndLogin('ARTIST');
+  userToken = await registerAndLogin('USER');
+});
 
 after(() => new Promise((resolve) => server.close(resolve)));
+after(() => mongoose.connection.close());
 
 test('artist can create artist and track, user can play', async () => {
-  const artistToken = await registerAndLogin('ARTIST');
-
   const { res: artistRes, body: artistBody } = await request('/api/v1/artists', {
     method: 'POST',
     headers: {
@@ -70,8 +78,6 @@ test('artist can create artist and track, user can play', async () => {
   });
   assert.equal(trackRes.status, 201);
   const trackId = trackBody.item.id;
-
-  const userToken = await registerAndLogin('USER');
   const { res: playRes, body: playBody } = await request(`/api/v1/tracks/${trackId}/play`, {
     method: 'POST',
     headers: { Authorization: `Bearer ${userToken}` },
@@ -100,9 +106,6 @@ test('artist can create artist and track, user can play', async () => {
 });
 
 test('artist cannot edit another artist profile', async () => {
-  const artistToken = await registerAndLogin('ARTIST');
-  const otherArtistToken = await registerAndLogin('ARTIST');
-
   const { body: artistBody } = await request('/api/v1/artists', {
     method: 'POST',
     headers: {
@@ -124,7 +127,6 @@ test('artist cannot edit another artist profile', async () => {
 });
 
 test('user can add and remove favorite artists', async () => {
-  const artistToken = await registerAndLogin('ARTIST');
   const { body: artistBody } = await request('/api/v1/artists', {
     method: 'POST',
     headers: {
@@ -134,7 +136,6 @@ test('user can add and remove favorite artists', async () => {
     body: JSON.stringify({ stageName: 'Fav Artist', city: 'Montreal' }),
   });
 
-  const userToken = await registerAndLogin('USER');
   const artistId = artistBody.item.id;
 
   const { res: addRes, body: addBody } = await request(`/api/v1/favorites/artists/${artistId}`, {

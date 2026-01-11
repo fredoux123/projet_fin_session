@@ -20,3 +20,9 @@
 - GET /history (liste par utilisateur)
 - DELETE /history (vider)
 - Tests sur lecture + historique
+
+## Sprint 4 — Favoris + Gateway
+- Favoris artistes: add/list/remove (auth requis)
+- Idempotent + validation artiste
+- Tests favoris
+- Gateway API simple + tests proxy avec mocks

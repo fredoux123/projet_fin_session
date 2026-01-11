@@ -6,11 +6,12 @@ function normalizeQuery(value) {
   return typeof value === 'string' ? value.trim().toLowerCase() : '';
 }
 
-function listTracks({ artistId, genre }) {
+async function listTracks({ artistId, genre }) {
   const artistFilter = normalizeQuery(artistId);
   const genreFilter = normalizeQuery(genre);
 
-  return trackRepository.findAll().filter((track) => {
+  const tracks = await trackRepository.findAll();
+  return tracks.filter((track) => {
     if (artistFilter && track.artistId.toLowerCase() !== artistFilter) {
       return false;
     }
@@ -21,22 +22,22 @@ function listTracks({ artistId, genre }) {
   });
 }
 
-function getTrack(id) {
-  const track = trackRepository.findById(id);
+async function getTrack(id) {
+  const track = await trackRepository.findById(id);
   if (!track) {
     throw new HttpError(404, 'Track not found');
   }
   return track;
 }
 
-function createTrack({ title, durationSec, genre, audioUrl, coverUrl, artistId }, user) {
+async function createTrack({ title, durationSec, genre, audioUrl, coverUrl, artistId }, user) {
   if (!title || typeof title !== 'string') {
     throw new HttpError(400, 'Title is required');
   }
   if (!artistId || typeof artistId !== 'string') {
     throw new HttpError(400, 'Artist ID is required');
   }
-  const artist = artistRepository.findById(artistId);
+  const artist = await artistRepository.findById(artistId);
   if (!artist) {
     throw new HttpError(404, 'Artist not found');
   }
@@ -54,8 +55,8 @@ function createTrack({ title, durationSec, genre, audioUrl, coverUrl, artistId }
   });
 }
 
-function updateTrack(id, updates, user) {
-  const track = getTrack(id);
+async function updateTrack(id, updates, user) {
+  const track = await getTrack(id);
   if (user.role !== 'ADMIN' && track.userId !== user.id) {
     throw new HttpError(403, 'Forbidden');
   }
@@ -78,17 +79,19 @@ function updateTrack(id, updates, user) {
   return trackRepository.update(id, sanitized);
 }
 
-function deleteTrack(id) {
-  const removed = trackRepository.remove(id);
+async function deleteTrack(id) {
+  const removed = await trackRepository.remove(id);
   if (!removed) {
     throw new HttpError(404, 'Track not found');
   }
   return removed;
 }
 
-function playTrack(id) {
-  const track = getTrack(id);
-  track.playCount += 1;
+async function playTrack(id) {
+  const track = await trackRepository.incrementPlayCount(id);
+  if (!track) {
+    throw new HttpError(404, 'Track not found');
+  }
   return track;
 }
 

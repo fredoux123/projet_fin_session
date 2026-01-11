@@ -1,33 +1,38 @@
-import crypto from 'node:crypto';
+import Favorite from '../models/Favorite.js';
 
-const favorites = [];
+function toDTO(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    userId: obj.userId,
+    artistId: obj.artistId,
+    createdAt: new Date(obj.createdAt).toISOString(),
+  };
+}
 
-function create({ userId, artistId }) {
-  const favorite = {
-    id: crypto.randomUUID(),
+async function create({ userId, artistId }) {
+  const favorite = await Favorite.create({
     userId,
     artistId,
-    createdAt: new Date().toISOString(),
-  };
-  favorites.push(favorite);
-  return favorite;
+    createdAt: new Date(),
+  });
+  return toDTO(favorite);
 }
 
-function findByUserAndArtist(userId, artistId) {
-  return favorites.find((fav) => fav.userId === userId && fav.artistId === artistId) || null;
+async function findByUserAndArtist(userId, artistId) {
+  const favorite = await Favorite.findOne({ userId, artistId }).lean();
+  return toDTO(favorite);
 }
 
-function listByUser(userId) {
-  return favorites.filter((fav) => fav.userId === userId);
+async function listByUser(userId) {
+  const favorites = await Favorite.find({ userId }).lean();
+  return favorites.map(toDTO);
 }
 
-function removeByUserAndArtist(userId, artistId) {
-  const index = favorites.findIndex((fav) => fav.userId === userId && fav.artistId === artistId);
-  if (index === -1) {
-    return null;
-  }
-  const [removed] = favorites.splice(index, 1);
-  return removed;
+async function removeByUserAndArtist(userId, artistId) {
+  const favorite = await Favorite.findOneAndDelete({ userId, artistId }).lean();
+  return toDTO(favorite);
 }
 
 export default {

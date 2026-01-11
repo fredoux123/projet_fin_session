@@ -1,31 +1,29 @@
-import crypto from 'node:crypto';
+import History from '../models/History.js';
 
-const history = [];
-
-function add({ userId, trackId, playedAt }) {
-  const entry = {
-    id: crypto.randomUUID(),
-    userId,
-    trackId,
-    playedAt,
+function toDTO(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    userId: obj.userId,
+    trackId: obj.trackId,
+    playedAt: new Date(obj.playedAt).toISOString(),
   };
-  history.push(entry);
-  return entry;
 }
 
-function listByUserId(userId) {
-  return history.filter((entry) => entry.userId === userId);
+async function add({ userId, trackId, playedAt }) {
+  const entry = await History.create({ userId, trackId, playedAt });
+  return toDTO(entry);
 }
 
-function clearByUserId(userId) {
-  let removed = 0;
-  for (let i = history.length - 1; i >= 0; i -= 1) {
-    if (history[i].userId === userId) {
-      history.splice(i, 1);
-      removed += 1;
-    }
-  }
-  return removed;
+async function listByUserId(userId) {
+  const entries = await History.find({ userId }).lean();
+  return entries.map(toDTO);
+}
+
+async function clearByUserId(userId) {
+  const result = await History.deleteMany({ userId });
+  return result.deletedCount || 0;
 }
 
 export default {

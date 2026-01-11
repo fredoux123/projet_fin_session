@@ -1,8 +1,8 @@
 import authService from '../services/authService.js';
 
-export function me(req, res, next) {
+export async function me(req, res, next) {
   try {
-    const user = authService.getUserById(req.user.id);
+    const user = await authService.getUserById(req.user.id);
     res.status(200).json({ item: user });
   } catch (err) {
     next(err);

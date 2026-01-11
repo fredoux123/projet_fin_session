@@ -1,17 +1,17 @@
 import historyService from '../services/historyService.js';
 
-export function list(req, res, next) {
+export async function list(req, res, next) {
   try {
-    const entries = historyService.listHistory(req.user.id);
+    const entries = await historyService.listHistory(req.user.id);
     res.status(200).json({ items: entries });
   } catch (err) {
     next(err);
   }
 }
 
-export function clear(req, res, next) {
+export async function clear(req, res, next) {
   try {
-    historyService.clearHistory(req.user.id);
+    await historyService.clearHistory(req.user.id);
     res.status(204).send();
   } catch (err) {
     next(err);

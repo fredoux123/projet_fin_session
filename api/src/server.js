@@ -3,6 +3,7 @@ import express from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import { fileURLToPath } from 'url';
+import { connectToDatabase } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import artistRoutes from './routes/artistRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
@@ -20,6 +21,11 @@ app.use(morgan('dev'));
 const PORT = process.env.PORT || 3000;
 app.locals.discoveryUrl = process.env.DISCOVERY_URL || 'http://localhost:3001';
 app.locals.iaUrl = process.env.IA_URL || 'http://localhost:8001';
+
+connectToDatabase().catch((err) => {
+  console.error('Mongo connection failed:', err.message);
+  process.exit(1);
+});
 
 async function proxyRequest(baseUrl, req, res) {
   const targetUrl = new URL(req.url, baseUrl).toString();

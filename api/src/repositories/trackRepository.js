@@ -1,47 +1,57 @@
-import crypto from 'node:crypto';
+import Track from '../models/Track.js';
 
-const tracks = [];
+function toDTO(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    title: obj.title,
+    durationSec: obj.durationSec,
+    genre: obj.genre,
+    audioUrl: obj.audioUrl,
+    coverUrl: obj.coverUrl,
+    artistId: obj.artistId,
+    userId: obj.userId,
+    playCount: obj.playCount,
+  };
+}
 
-function create({ title, durationSec, genre, audioUrl, coverUrl, artistId, userId }) {
-  const track = {
-    id: crypto.randomUUID(),
+async function create({ title, durationSec, genre, audioUrl, coverUrl, artistId, userId }) {
+  const track = await Track.create({
     title,
     durationSec,
-    genre: genre || '',
-    audioUrl: audioUrl || '',
-    coverUrl: coverUrl || '',
+    genre,
+    audioUrl,
+    coverUrl,
     artistId,
     userId,
-    playCount: 0,
-  };
-  tracks.push(track);
-  return track;
+  });
+  return toDTO(track);
 }
 
-function findById(id) {
-  return tracks.find((track) => track.id === id) || null;
+async function findById(id) {
+  const track = await Track.findById(id).lean();
+  return toDTO(track);
 }
 
-function findAll() {
-  return [...tracks];
+async function findAll() {
+  const tracks = await Track.find({}).lean();
+  return tracks.map(toDTO);
 }
 
-function update(id, updates) {
-  const track = findById(id);
-  if (!track) {
-    return null;
-  }
-  Object.assign(track, updates);
-  return track;
+async function update(id, updates) {
+  const track = await Track.findByIdAndUpdate(id, updates, { new: true }).lean();
+  return toDTO(track);
 }
 
-function remove(id) {
-  const index = tracks.findIndex((track) => track.id === id);
-  if (index === -1) {
-    return null;
-  }
-  const [removed] = tracks.splice(index, 1);
-  return removed;
+async function remove(id) {
+  const track = await Track.findByIdAndDelete(id).lean();
+  return toDTO(track);
+}
+
+async function incrementPlayCount(id) {
+  const track = await Track.findByIdAndUpdate(id, { $inc: { playCount: 1 } }, { new: true }).lean();
+  return toDTO(track);
 }
 
 export default {
@@ -50,4 +60,5 @@ export default {
   findAll,
   update,
   remove,
+  incrementPlayCount,
 };

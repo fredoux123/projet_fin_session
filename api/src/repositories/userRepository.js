@@ -1,19 +1,29 @@
-import crypto from 'node:crypto';
+import User from '../models/User.js';
 
-const users = [];
-
-function create({ email, passwordHash, role }) {
-  const user = { id: crypto.randomUUID(), email, passwordHash, role };
-  users.push(user);
-  return user;
+function toDTO(doc) {
+  if (!doc) return null;
+  const obj = doc.toObject ? doc.toObject() : doc;
+  return {
+    id: obj._id.toString(),
+    email: obj.email,
+    passwordHash: obj.passwordHash,
+    role: obj.role,
+  };
 }
 
-function findByEmail(email) {
-  return users.find((user) => user.email === email) || null;
+async function create({ email, passwordHash, role }) {
+  const user = await User.create({ email, passwordHash, role });
+  return toDTO(user);
 }
 
-function findById(id) {
-  return users.find((user) => user.id === id) || null;
+async function findByEmail(email) {
+  const user = await User.findOne({ email }).lean();
+  return toDTO(user);
+}
+
+async function findById(id) {
+  const user = await User.findById(id).lean();
+  return toDTO(user);
 }
 
 export default {
