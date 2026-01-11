@@ -35,14 +35,14 @@ async function registerAndLogin(role) {
   return body.token;
 }
 
-before(() => new Promise((resolve) => {
-  server = app.listen(0, () => {
-    const { port } = server.address();
-    baseUrl = `http://127.0.0.1:${port}`;
-    resolve();
-  });
-}));
 before(async () => {
+  await new Promise((resolve) => {
+    server = app.listen(0, () => {
+      const { port } = server.address();
+      baseUrl = `http://127.0.0.1:${port}`;
+      resolve();
+    });
+  });
   artistToken = await registerAndLogin('ARTIST');
   otherArtistToken = await registerAndLogin('ARTIST');
   userToken = await registerAndLogin('USER');
