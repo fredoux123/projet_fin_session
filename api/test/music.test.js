@@ -122,3 +122,53 @@ test('artist cannot edit another artist profile', async () => {
   });
   assert.equal(updateRes.status, 403);
 });
+
+test('user can add and remove favorite artists', async () => {
+  const artistToken = await registerAndLogin('ARTIST');
+  const { body: artistBody } = await request('/api/v1/artists', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${artistToken}`,
+    },
+    body: JSON.stringify({ stageName: 'Fav Artist', city: 'Montreal' }),
+  });
+
+  const userToken = await registerAndLogin('USER');
+  const artistId = artistBody.item.id;
+
+  const { res: addRes, body: addBody } = await request(`/api/v1/favorites/artists/${artistId}`, {
+    method: 'POST',
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(addRes.status, 200);
+  assert.equal(addBody.item.artistId, artistId);
+
+  const { res: addAgainRes, body: addAgainBody } = await request(
+    `/api/v1/favorites/artists/${artistId}`,
+    {
+      method: 'POST',
+      headers: { Authorization: `Bearer ${userToken}` },
+    },
+  );
+  assert.equal(addAgainRes.status, 200);
+  assert.equal(addAgainBody.item.id, addBody.item.id);
+
+  const { res: listRes, body: listBody } = await request('/api/v1/favorites/artists', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(listRes.status, 200);
+  assert.equal(listBody.items.length, 1);
+  assert.equal(listBody.items[0].artistId, artistId);
+
+  const { res: deleteRes } = await request(`/api/v1/favorites/artists/${artistId}`, {
+    method: 'DELETE',
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(deleteRes.status, 204);
+
+  const { body: emptyBody } = await request('/api/v1/favorites/artists', {
+    headers: { Authorization: `Bearer ${userToken}` },
+  });
+  assert.equal(emptyBody.items.length, 0);
+});
