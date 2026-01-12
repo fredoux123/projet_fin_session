@@ -175,3 +175,75 @@ test('user can add and remove favorite artists', async () => {
   });
   assert.equal(emptyBody.items.length, 0);
 });
+
+test('events workflow: create, approve, visibility, ownership, reject', async () => {
+  const artistToken = await registerAndLogin('ARTIST');
+  const { body: artistBody } = await request('/api/v1/artists', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${artistToken}`,
+    },
+    body: JSON.stringify({ stageName: 'Event Artist', city: 'Montreal' }),
+  });
+
+  const { res: createRes, body: created } = await request('/api/v1/events', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${artistToken}`,
+    },
+    body: JSON.stringify({
+      title: 'Showcase',
+      city: 'Montreal',
+      startAt: '2030-01-01T20:00:00Z',
+      artistId: artistBody.item.id,
+      tags: ['rap'],
+    }),
+  });
+  assert.equal(createRes.status, 201);
+  assert.equal(created.item.status, 'PENDING');
+
+  const { body: publicList } = await request('/api/v1/events');
+  assert.equal(publicList.items.length, 0);
+
+  const adminToken = await registerAndLogin('ADMIN');
+  const { res: approveRes, body: approved } = await request(
+    `/api/v1/admin/events/${created.item.id}/approve`,
+    {
+      method: 'PATCH',
+      headers: { Authorization: `Bearer ${adminToken}` },
+    },
+  );
+  assert.equal(approveRes.status, 200);
+  assert.equal(approved.item.status, 'APPROVED');
+
+  const { body: publicAfter } = await request('/api/v1/events');
+  assert.equal(publicAfter.items.length, 1);
+
+  const otherArtistToken = await registerAndLogin('ARTIST');
+  const { res: updateRes } = await request(`/api/v1/events/${created.item.id}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${otherArtistToken}`,
+    },
+    body: JSON.stringify({ title: 'Hacked' }),
+  });
+  assert.equal(updateRes.status, 403);
+
+  const { res: rejectRes, body: rejected } = await request(
+    `/api/v1/admin/events/${created.item.id}/reject`,
+    {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${adminToken}`,
+      },
+      body: JSON.stringify({ reason: 'Invalid content' }),
+    },
+  );
+  assert.equal(rejectRes.status, 200);
+  assert.equal(rejected.item.status, 'REJECTED');
+  assert.equal(rejected.item.moderationReason, 'Invalid content');
+});

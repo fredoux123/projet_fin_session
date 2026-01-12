@@ -32,3 +32,9 @@
 - API Node: GET /api/v1/recommendations (auth) -> IA
 - Tests avec mock IA
 - Doc algorithme dans docs/RECOMMENDATIONS.md
+
+## Sprint 6 — Evenements + moderation
+- CRUD events (public + ARTIST/ADMIN)
+- Workflow PENDING/APPROVED/REJECTED
+- Admin approve/reject avec raison
+- Tests moderation + ownership

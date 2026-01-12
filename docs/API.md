@@ -158,6 +158,58 @@ curl -i -X DELETE http://localhost:3000/api/v1/favorites/artists/<artistId> \
   -H "Authorization: Bearer $TOKEN"
 ```
 
+## Evenements
+Liste (public, APPROVED uniquement):
+```bash
+curl -s http://localhost:3000/api/v1/events
+```
+
+Details (public):
+```bash
+curl -s http://localhost:3000/api/v1/events/<eventId>
+```
+
+Creation (ARTIST/ADMIN):
+```bash
+TOKEN="TOKEN_ARTIST_OU_ADMIN"
+curl -s -X POST http://localhost:3000/api/v1/events \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"Showcase","city":"Montreal","startAt":"2030-01-01T20:00:00Z","artistId":"<artistId>","tags":["rap"]}'
+```
+
+Update (owner ARTIST ou ADMIN):
+```bash
+TOKEN="TOKEN_ARTIST_OU_ADMIN"
+curl -s -X PUT http://localhost:3000/api/v1/events/<eventId> \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"Updated Title"}'
+```
+
+Approve (ADMIN):
+```bash
+TOKEN="TOKEN_ADMIN"
+curl -s -X PATCH http://localhost:3000/api/v1/admin/events/<eventId>/approve \
+  -H "Authorization: Bearer $TOKEN"
+```
+
+Reject (ADMIN):
+```bash
+TOKEN="TOKEN_ADMIN"
+curl -s -X PATCH http://localhost:3000/api/v1/admin/events/<eventId>/reject \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"reason":"Invalid content"}'
+```
+
+Delete (ADMIN):
+```bash
+TOKEN="TOKEN_ADMIN"
+curl -i -X DELETE http://localhost:3000/api/v1/events/<eventId> \
+  -H "Authorization: Bearer $TOKEN"
+```
+
 ## External / IA (optionnel)
 Artistes externes:
 ```bash

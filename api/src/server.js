@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import { connectToDatabase } from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
 import artistRoutes from './routes/artistRoutes.js';
+import eventRoutes from './routes/eventRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
 import historyRoutes from './routes/historyRoutes.js';
 import recommendationRoutes from './routes/recommendationRoutes.js';
@@ -62,6 +63,7 @@ app.get('/health', (req, res) => res.json({ item: { status: 'ok', service: 'api'
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/public', publicRoutes);
 app.use('/api/v1', artistRoutes);
+app.use('/api/v1', eventRoutes);
 app.use('/api/v1', trackRoutes);
 app.use('/api/v1', favoriteRoutes);
 app.use('/api/v1', historyRoutes);
