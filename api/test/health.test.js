@@ -1,6 +1,5 @@
 import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
-import mongoose from 'mongoose';
 import { app } from '../src/server.js';
 import { connectToDatabase } from '../src/config/db.js';
 
@@ -19,11 +18,10 @@ before(async () => {
 });
 
 after(() => new Promise((resolve) => server.close(resolve)));
-after(() => mongoose.connection.close());
 
 test('health endpoint responds', async () => {
   const res = await fetch(`${baseUrl}/health`);
   assert.equal(res.status, 200);
   const body = await res.json();
-  assert.equal(body.item.service, 'api');
+  assert.equal(body.service, 'api');
 });
