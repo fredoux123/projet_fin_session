@@ -13,6 +13,8 @@ Workflow : `.github/workflows/ci.yml`
 - Install
 - Lint
 - Test
+  
+Note: la CI utilise MongoDB pour les tests API.
 
 ### discovery-service (Node)
 Même étapes que `api`.
