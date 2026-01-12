@@ -2,6 +2,7 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
 import { app } from '../src/server.js';
+import { connectToDatabase } from '../src/config/db.js';
 
 let server;
 let baseUrl;
@@ -35,6 +36,7 @@ async function registerAndLogin(role) {
 }
 
 before(async () => {
+  await connectToDatabase();
   await new Promise((resolve) => {
     server = app.listen(0, () => {
       const { port } = server.address();
@@ -109,17 +111,6 @@ test('public external artists returns items', async () => {
   if (res.status === 200) {
     assert.ok(Array.isArray(body.items));
     assert.ok(body.source);
-  } else {
-    assert.equal(res.status, 502);
-    assert.ok(body.error);
-  }
-});
-
-test('public recommendations returns item', async () => {
-  const { res, body } = await request('/api/v1/recommendations?userId=demo');
-  if (res.status === 200) {
-    assert.ok(body.item);
-    assert.equal(body.item.userId, 'demo');
   } else {
     assert.equal(res.status, 502);
     assert.ok(body.error);

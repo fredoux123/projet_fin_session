@@ -2,17 +2,21 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
 import { app } from '../src/server.js';
+import { connectToDatabase } from '../src/config/db.js';
 
 let server;
 let baseUrl;
 
-before(() => new Promise((resolve) => {
-  server = app.listen(0, () => {
-    const { port } = server.address();
-    baseUrl = `http://127.0.0.1:${port}`;
-    resolve();
+before(async () => {
+  await connectToDatabase();
+  await new Promise((resolve) => {
+    server = app.listen(0, () => {
+      const { port } = server.address();
+      baseUrl = `http://127.0.0.1:${port}`;
+      resolve();
+    });
   });
-}));
+});
 
 after(() => new Promise((resolve) => server.close(resolve)));
 after(() => mongoose.connection.close());

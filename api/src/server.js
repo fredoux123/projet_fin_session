@@ -8,6 +8,7 @@ import authRoutes from './routes/authRoutes.js';
 import artistRoutes from './routes/artistRoutes.js';
 import favoriteRoutes from './routes/favoriteRoutes.js';
 import historyRoutes from './routes/historyRoutes.js';
+import recommendationRoutes from './routes/recommendationRoutes.js';
 import trackRoutes from './routes/trackRoutes.js';
 import userRoutes from './routes/userRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
@@ -21,11 +22,6 @@ app.use(morgan('dev'));
 const PORT = process.env.PORT || 3000;
 app.locals.discoveryUrl = process.env.DISCOVERY_URL || 'http://localhost:3001';
 app.locals.iaUrl = process.env.IA_URL || 'http://localhost:8001';
-
-connectToDatabase().catch((err) => {
-  console.error('Mongo connection failed:', err.message);
-  process.exit(1);
-});
 
 async function proxyRequest(baseUrl, req, res) {
   const targetUrl = new URL(req.url, baseUrl).toString();
@@ -69,6 +65,7 @@ app.use('/api/v1', artistRoutes);
 app.use('/api/v1', trackRoutes);
 app.use('/api/v1', favoriteRoutes);
 app.use('/api/v1', historyRoutes);
+app.use('/api/v1', recommendationRoutes);
 app.use('/api/v1', userRoutes);
 app.use('/api/v1/admin', adminRoutes);
 
@@ -86,18 +83,6 @@ app.get('/api/v1/external-artists', async (req, res) => {
   }
 });
 
-app.get('/api/v1/recommendations', async (req, res) => {
-  const userId = req.query.userId || 'demo';
-  try {
-    const r = await fetch(
-      `${req.app.locals.iaUrl}/recommendations?userId=${encodeURIComponent(userId)}`,
-    );
-    const data = await r.json();
-    res.json({ item: data });
-  } catch {
-    res.status(502).json({ error: 'IA service unreachable' });
-  }
-});
 
 app.use((err, req, res, next) => {
   if (!err) {
@@ -110,7 +95,17 @@ app.use((err, req, res, next) => {
 
 export { app };
 
+async function startServer() {
+  try {
+    await connectToDatabase();
+    app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+  } catch (err) {
+    console.error('Mongo connection failed:', err.message);
+    process.exit(1);
+  }
+}
+
 const isDirectRun = process.argv[1] === fileURLToPath(import.meta.url);
 if (isDirectRun) {
-  app.listen(PORT, () => console.log(`API running on http://localhost:${PORT}`));
+  startServer();
 }

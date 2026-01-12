@@ -19,3 +19,4 @@
 ## Documentation API
 - `docs/API.md` : Endpoints + exemples curl (MVP)
 - `docs/SPRINTS.md` : Resumes des sprints
+- `docs/RECOMMENDATIONS.md` : Algo de recommandations (Sprint 5)

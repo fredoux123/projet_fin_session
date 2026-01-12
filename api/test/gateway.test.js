@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import http from 'node:http';
 import mongoose from 'mongoose';
 import { app } from '../src/server.js';
+import { connectToDatabase } from '../src/config/db.js';
 
 let server;
 let baseUrl;
@@ -20,6 +21,7 @@ function startMockServer(handler) {
 }
 
 before(async () => {
+  await connectToDatabase();
   const discovery = await startMockServer((req, res) => {
     if (req.url.startsWith('/external-artists')) {
       res.writeHead(200, { 'Content-Type': 'application/json' });

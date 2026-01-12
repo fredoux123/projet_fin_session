@@ -26,3 +26,9 @@
 - Idempotent + validation artiste
 - Tests favoris
 - Gateway API simple + tests proxy avec mocks
+
+## Sprint 5 — Recommandations IA (content-based)
+- IA FastAPI: POST /recommendations avec scoring explicable
+- API Node: GET /api/v1/recommendations (auth) -> IA
+- Tests avec mock IA
+- Doc algorithme dans docs/RECOMMENDATIONS.md

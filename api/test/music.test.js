@@ -2,6 +2,7 @@ import { test, before, after } from 'node:test';
 import assert from 'node:assert/strict';
 import mongoose from 'mongoose';
 import { app } from '../src/server.js';
+import { connectToDatabase } from '../src/config/db.js';
 
 let server;
 let baseUrl;
@@ -36,6 +37,7 @@ async function registerAndLogin(role) {
 }
 
 before(async () => {
+  await connectToDatabase();
   await new Promise((resolve) => {
     server = app.listen(0, () => {
       const { port } = server.address();

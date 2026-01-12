@@ -164,9 +164,11 @@ Artistes externes:
 curl -s http://localhost:3000/api/v1/external-artists
 ```
 
-Recommandations:
+Recommandations (token requis):
 ```bash
-curl -s "http://localhost:3000/api/v1/recommendations?userId=demo"
+TOKEN="TOKEN_USER_OU_ARTIST_OU_ADMIN"
+curl -s http://localhost:3000/api/v1/recommendations \
+  -H "Authorization: Bearer $TOKEN"
 ```
 
 ## API Gateway (proxy simple)
